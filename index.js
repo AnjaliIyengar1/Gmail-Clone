@@ -8,16 +8,16 @@ const server = new SMTPServer({
         console.log('onConnect', session.id);
         callback(); // Accept the connection
     },
-    mailFrom(address, session, callback) {
-        console.log('mailFrom', address.address, session.id);
+    onMailFrom(address, session, callback) {
+        console.log('onMailFrom', address.address, session.id);
         callback(); // Accept the sender
     },
-    onrcptTo(address, session, callback) {
-        console.log('onrcptTo', address.address, session.id);
+    onRcptTo(address, session, callback) {
+        console.log('onRcptTo', address.address, session.id);
         callback(); // Accept the recipient
     },
     onData(stream, session, callback) {
-        stream.on('data', (data) => console.log('ondata', data.toString()));
+        stream.on('data', (data) => console.log('onData', data.toString()));
         stream.on('end', callback); // Accept the message
     }
 });
