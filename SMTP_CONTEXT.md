@@ -54,3 +54,39 @@ sequenceDiagram
     Client->>Server: "QUIT"
     Server-->>Client: "221 Service closing transmission channel"
 ```
+
+## Test
+
+To test the custom SMTP server, launch two parallel PowerShell sessions on the EC2 instance. The first session runs node index.js to start the server listening on port 25, while the second session acts as an email client sending a test payload to localhost. Once sent, return to the first session to verify that the server captured the connection details, sender, recipient, and message body in real time.
+
+### PowerShell script
+
+//==============================================================================
+//STEP 1 - Window 1: Run AWS EC2 instance: Launch SMTP server (leave running)
+//==============================================================================
+
+    cd C:\app
+    node index.js
+
+// Expected banner output:
+
+    SMTP server is listening on port 25
+
+
+//==============================================================================
+// STEP 2 - Window 2: Run another AWS EC2 instance: Dispatch test email payload
+// ==============================================================================
+
+    $smtp = New-Object System.Net.Mail.SmtpClient("localhost", 25)
+    $smtp.Send("sender@example.com", "recipient@example.com", "Test Subject", "Hello from AWS EC2 instance!")
+
+
+//==============================================================================
+// STEP 3 - Switch back to Window 1 to verify server logs
+//==============================================================================
+
+    onConnect  <session-id>
+    onMailFrom sender@example.com <session-id>
+    onRcptTo   recipient@example.com <session-id>
+    ondata     Subject: Test Subject
+    ondata     Hello from AWS EC2 instance!
